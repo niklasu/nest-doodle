@@ -1,12 +1,19 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Body, Controller, Get, Post } from '@nestjs/common';
+import { AppointmentService } from './appointment.service';
+import { Appointment } from './appointment.entity';
+import { CreateAppointment } from './appointment.request';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly appService: AppointmentService) {}
 
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  getAll(): Array<Appointment> {
+    return this.appService.getAll();
+  }
+
+  @Post()
+  create(@Body() request: CreateAppointment): Appointment {
+    return this.appService.create(request);
   }
 }
