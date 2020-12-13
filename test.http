@@ -1,8 +1,8 @@
-POST http://localhost:3000
+POST http://localhost:3000/appointments
 Content-Type: application/json
 
-{"name":  "go to cinema"}
+{"name":  "go to somewhere else"}
 
 ###
 
-GET http://localhost:3000
+GET http://localhost:3000/appointments

@@ -3,17 +3,17 @@ import { AppointmentService } from './appointment.service';
 import { Appointment } from './appointment.entity';
 import { CreateAppointment } from './appointment.request';
 
-@Controller()
+@Controller('appointments')
 export class AppController {
-  constructor(private readonly appService: AppointmentService) {}
+  constructor(private readonly appointmentService: AppointmentService) {}
 
   @Get()
   getAll(): Array<Appointment> {
-    return this.appService.getAll();
+    return this.appointmentService.getAll();
   }
 
   @Post()
   create(@Body() request: CreateAppointment): Appointment {
-    return this.appService.create(request);
+    return this.appointmentService.create(request);
   }
 }
