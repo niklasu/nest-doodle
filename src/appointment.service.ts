@@ -14,6 +14,7 @@ export class AppointmentService {
     const appointment = new Appointment(
       AppointmentService.getId(),
       request.name,
+      request.participants,
     );
     this.appointments.push(appointment);
     return appointment;

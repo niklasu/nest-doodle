@@ -1,7 +1,7 @@
 POST http://localhost:3000/appointments
 Content-Type: application/json
 
-{"name":  "go to somewhere else"}
+{"name":  "go to somewhere else", "participants":  [1,2,3]}
 
 ###
 
