@@ -23,4 +23,8 @@ export class AppointmentService {
   private static getId() {
     return Math.floor(Math.random() * (999 + 1));
   }
+
+  getUserById(id: number) {
+    return this.appointments.filter((a) => a.participants.includes(id));
+  }
 }
