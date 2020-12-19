@@ -1,5 +1,8 @@
+import { AnswerEnum } from './submitAnswer';
+
 class Answer {
   participantId: number;
+  answer: AnswerEnum;
 }
 
 export class Appointment {

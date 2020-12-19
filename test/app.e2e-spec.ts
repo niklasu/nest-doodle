@@ -3,6 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { AppointmentService } from '../src/appointment.service';
+import { AnswerEnum } from '../src/submitAnswer';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -48,13 +49,18 @@ describe('AppController (e2e)', () => {
       name: 'meet in the cinema',
     });
 
-    await request(app.getHttpServer())
-      .post('/appointments/answers')
-      .send({ appointmentId: id, participantId: 42 });
+    await request(app.getHttpServer()).post('/appointments/answers').send({
+      appointmentId: id,
+      participantId: 42,
+      answer: AnswerEnum.ACCEPTED,
+    });
 
     expect(appointmentService.getAll()[0].answers.length).toBe(1);
     const createdAnswer = appointmentService.getAll()[0].answers[0];
-    expect(createdAnswer).toEqual({ participantId: 42 });
+    expect(createdAnswer).toEqual({
+      participantId: 42,
+      answer: AnswerEnum.ACCEPTED,
+    });
   });
 
   afterAll(async () => {
