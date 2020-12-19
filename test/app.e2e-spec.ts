@@ -50,9 +50,11 @@ describe('AppController (e2e)', () => {
 
     await request(app.getHttpServer())
       .post('/appointments/answers')
-      .send({ appointmentId: id });
+      .send({ appointmentId: id, participantId: 42 });
 
     expect(appointmentService.getAll()[0].answers.length).toBe(1);
+    const createdAnswer = appointmentService.getAll()[0].answers[0];
+    expect(createdAnswer).toEqual({ participantId: 42 });
   });
 
   afterAll(async () => {

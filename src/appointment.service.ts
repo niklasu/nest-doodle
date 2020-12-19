@@ -37,6 +37,6 @@ export class AppointmentService {
       throw new BadRequestException();
     }
     const app = appointmentsWithId[0];
-    app.answers.push({ participantId: 0 });
+    app.answers.push({ participantId: request.participantId });
   }
 }
