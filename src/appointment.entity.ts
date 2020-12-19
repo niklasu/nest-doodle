@@ -1,7 +1,12 @@
+class Answer {
+  participantId: number;
+}
+
 export class Appointment {
   id: number;
   name: string;
   participants: number[];
+  answers: Answer[] = [];
 
   constructor(id: number, value: string, participants: number[]) {
     this.name = value;

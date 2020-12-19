@@ -34,6 +34,27 @@ describe('AppController (e2e)', () => {
       });
   });
 
+  it('submit for appointment that does not exist', () => {
+    return request(app.getHttpServer())
+      .post('/appointments/answers')
+      .send({ appointmentId: 33 })
+      .expect(400);
+  });
+
+  it('submit for appointment', async () => {
+    const appointmentService = app.get(AppointmentService);
+    const { id } = appointmentService.create({
+      participants: [1, 2, 3],
+      name: 'meet in the cinema',
+    });
+
+    await request(app.getHttpServer())
+      .post('/appointments/answers')
+      .send({ appointmentId: id });
+
+    expect(appointmentService.getAll()[0].answers.length).toBe(1);
+  });
+
   afterAll(async () => {
     await app.close();
   });

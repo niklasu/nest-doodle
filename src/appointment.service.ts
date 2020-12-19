@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Appointment } from './appointment.entity';
 import { CreateAppointment } from './appointment.request';
+import { SubmitAnswer } from './submitAnswer';
 
 @Injectable()
 export class AppointmentService {
@@ -26,5 +27,16 @@ export class AppointmentService {
 
   getUserById(id: number) {
     return this.appointments.filter((a) => a.participants.includes(id));
+  }
+
+  answer(request: SubmitAnswer) {
+    const appointmentsWithId = this.appointments.filter(
+      (a) => a.id == request.appointmentId,
+    );
+    if (appointmentsWithId.length == 0) {
+      throw new BadRequestException();
+    }
+    const app = appointmentsWithId[0];
+    app.answers.push({ participantId: 0 });
   }
 }
