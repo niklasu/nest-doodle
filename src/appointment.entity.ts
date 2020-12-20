@@ -21,6 +21,6 @@ export class Appointment {
 
 export enum StateEnum {
   PENDING,
-  REJECTED,
-  ACCEPTED,
+  CALLED_OFF,
+  CONFIRMED,
 }

@@ -45,9 +45,9 @@ export class AppointmentService {
       const oneIsRejected: boolean =
         app.answers.filter((a) => a.answer === AnswerEnum.REJECTED).length > 0;
       if (oneIsRejected) {
-        app.state = StateEnum.REJECTED;
+        app.state = StateEnum.CALLED_OFF;
       } else {
-        app.state = StateEnum.ACCEPTED;
+        app.state = StateEnum.CONFIRMED;
       }
     }
   }

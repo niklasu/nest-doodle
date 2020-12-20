@@ -97,7 +97,7 @@ describe('AppointmentsController (e2e)', () => {
     expect(appointment).toMatchObject({
       name: 'meet in the cinema',
       participants: [1, 2],
-      state: StateEnum.ACCEPTED,
+      state: StateEnum.CONFIRMED,
     });
   });
 
@@ -127,7 +127,7 @@ describe('AppointmentsController (e2e)', () => {
     expect(appointment).toMatchObject({
       name: 'meet in the cinema',
       participants: [1, 2],
-      state: StateEnum.REJECTED,
+      state: StateEnum.CALLED_OFF,
     });
   });
 
