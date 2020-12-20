@@ -29,10 +29,8 @@ export class AppointmentService {
     return this.appointments.filter((a) => a.participants.includes(id));
   }
 
-  answer(request: SubmitAnswer) {
-    const appointmentsWithId = this.appointments.filter(
-      (a) => a.id == request.appointmentId,
-    );
+  answer(id: number, request: SubmitAnswer) {
+    const appointmentsWithId = this.appointments.filter((a) => a.id == id);
     if (appointmentsWithId.length == 0) {
       throw new BadRequestException();
     }

@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+} from '@nestjs/common';
 import { AppointmentService } from './appointment.service';
 import { Appointment } from './appointment.entity';
 import { CreateAppointment } from './appointment.request';
@@ -18,8 +25,11 @@ export class AppointmentsController {
     return this.appointmentService.create(request);
   }
 
-  @Post('/answers')
-  answer(@Body() request: SubmitAnswer) {
-    this.appointmentService.answer(request);
+  @Post(':id/answers')
+  answer(
+    @Body() request: SubmitAnswer,
+    @Param('id', ParseIntPipe) appointmentId: number,
+  ) {
+    this.appointmentService.answer(appointmentId, request);
   }
 }
