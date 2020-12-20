@@ -35,6 +35,18 @@ describe('AppointmentsController (e2e)', () => {
       });
   });
 
+  it('delete an appointment', async () => {
+    const appointmentService = app.get(AppointmentService);
+    const { id } = appointmentService.create({
+      participants: [1, 2, 3],
+      name: 'meet in the park',
+    });
+
+    await request(app.getHttpServer()).delete(`/api/appointments/${id}`);
+
+    expect(appointmentService.getAll().length).toBe(0);
+  });
+
   it('submit for appointment that does not exist', () => {
     return request(app.getHttpServer())
       .post('/api/appointments/33/answers')

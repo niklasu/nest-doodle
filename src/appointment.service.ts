@@ -41,4 +41,8 @@ export class AppointmentService {
       answer: request.answer,
     });
   }
+
+  delete(appointmentId: number) {
+    this.appointments = this.appointments.filter((a) => a.id != appointmentId);
+  }
 }

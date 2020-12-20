@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -23,6 +24,11 @@ export class AppointmentsController {
   @Post()
   create(@Body() request: CreateAppointment): Appointment {
     return this.appointmentService.create(request);
+  }
+
+  @Delete(':id')
+  delete(@Param('id', ParseIntPipe) appointmentId: number) {
+    return this.appointmentService.delete(appointmentId);
   }
 
   @Post(':id/answers')
