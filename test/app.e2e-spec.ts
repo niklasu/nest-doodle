@@ -103,6 +103,16 @@ describe('AppointmentsController (e2e)', () => {
       });
   });
 
+  it('create appointment', async () => {
+    await request(app.getHttpServer())
+      .post('/api/appointments')
+      .send({ name: 'meet in the park', participants: [1, 2, 3] })
+      .expect(201);
+
+    const appointmentService = app.get(AppointmentService);
+    expect(appointmentService.getAll()[0].name).toBe('meet in the park');
+  });
+
   afterAll(async () => {
     await app.close();
   });
