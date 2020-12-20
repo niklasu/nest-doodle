@@ -29,7 +29,7 @@ describe('AppointmentsController (e2e)', () => {
     });
 
     return request(app.getHttpServer())
-      .get('/appointments')
+      .get('/api/appointments')
       .expect((res) => {
         expect(res.body).toHaveLength(2);
       });
@@ -37,7 +37,7 @@ describe('AppointmentsController (e2e)', () => {
 
   it('submit for appointment that does not exist', () => {
     return request(app.getHttpServer())
-      .post('/appointments/answers')
+      .post('/api/appointments/answers')
       .send({ appointmentId: 33 })
       .expect(400);
   });
@@ -49,7 +49,7 @@ describe('AppointmentsController (e2e)', () => {
       name: 'meet in the cinema',
     });
 
-    await request(app.getHttpServer()).post('/appointments/answers').send({
+    await request(app.getHttpServer()).post('/api/appointments/answers').send({
       appointmentId: id,
       participantId: 42,
       answer: AnswerEnum.ACCEPTED,
