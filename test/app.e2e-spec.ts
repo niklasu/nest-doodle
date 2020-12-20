@@ -5,7 +5,7 @@ import { AppModule } from '../src/app.module';
 import { AppointmentService } from '../src/appointment.service';
 import { AnswerEnum } from '../src/submitAnswer';
 
-describe('AppController (e2e)', () => {
+describe('AppointmentsController (e2e)', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
@@ -61,6 +61,34 @@ describe('AppController (e2e)', () => {
       participantId: 42,
       answer: AnswerEnum.ACCEPTED,
     });
+  });
+
+  it('get appointment invitations for user', () => {
+    const appointmentService = app.get(AppointmentService);
+    const { id: firstAppointmentId } = appointmentService.create({
+      participants: [1, 2, 3],
+      name: 'meet in the cinema',
+    });
+    const { id: secondAppointmentId } = appointmentService.create({
+      participants: [1, 2, 3],
+      name: 'meet in the park',
+    });
+    appointmentService.create({
+      participants: [2, 3],
+      name: 'meet in the store',
+    });
+
+    return request(app.getHttpServer())
+      .get('/users/1')
+      .expect(200)
+      .expect((res) => {
+        const body = res.body;
+        expect(body).toHaveLength(2);
+        expect(body.map((e) => e.id)).toEqual([
+          firstAppointmentId,
+          secondAppointmentId,
+        ]);
+      });
   });
 
   afterAll(async () => {

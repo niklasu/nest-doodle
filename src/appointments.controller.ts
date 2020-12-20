@@ -5,7 +5,7 @@ import { CreateAppointment } from './appointment.request';
 import { SubmitAnswer } from './submitAnswer';
 
 @Controller('appointments')
-export class AppController {
+export class AppointmentsController {
   constructor(private readonly appointmentService: AppointmentService) {}
 
   @Get()
