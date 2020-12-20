@@ -17,15 +17,24 @@ describe('AppointmentsController (e2e)', () => {
     await app.init();
   });
 
+  function createUsers(appointmentService: AppointmentService): Array<number> {
+    return [
+      appointmentService.createUser().id,
+      appointmentService.createUser().id,
+      appointmentService.createUser().id,
+    ];
+  }
+
   it('Get all appointments', () => {
     const appointmentService = app.get(AppointmentService);
+    const createdUserIds = createUsers(appointmentService);
     appointmentService.create({
-      participants: [1, 2, 3],
+      participants: createdUserIds,
       name: 'meet in the park',
     });
 
     appointmentService.create({
-      participants: [1, 2, 3],
+      participants: createdUserIds,
       name: 'meet in the cinema',
     });
 
@@ -38,8 +47,9 @@ describe('AppointmentsController (e2e)', () => {
 
   it('delete an appointment', async () => {
     const appointmentService = app.get(AppointmentService);
+    const users = createUsers(appointmentService);
     const { id } = appointmentService.create({
-      participants: [1, 2, 3],
+      participants: users,
       name: 'meet in the park',
     });
 
@@ -56,8 +66,9 @@ describe('AppointmentsController (e2e)', () => {
 
   it('submit for appointment', async () => {
     const appointmentService = app.get(AppointmentService);
+    const users = createUsers(appointmentService);
     const { id } = appointmentService.create({
-      participants: [1, 2, 3],
+      participants: users,
       name: 'meet in the cinema',
     });
 
@@ -78,12 +89,13 @@ describe('AppointmentsController (e2e)', () => {
 
   it('appointment state is accepted', async () => {
     const appointmentService = app.get(AppointmentService);
+    const users = createUsers(appointmentService).slice(0, 2);
     const { id } = appointmentService.create({
-      participants: [1, 2],
+      participants: users,
       name: 'meet in the cinema',
     });
 
-    for (const i of [1, 2]) {
+    for (const i of users) {
       await request(app.getHttpServer())
         .post(`/api/appointments/${id}/answers`)
         .send({
@@ -96,29 +108,30 @@ describe('AppointmentsController (e2e)', () => {
     expect(appointment.answers.length).toBe(2);
     expect(appointment).toMatchObject({
       name: 'meet in the cinema',
-      participants: [1, 2],
+      participants: users,
       state: StateEnum.CONFIRMED,
     });
   });
 
   it('appointment state is rejected', async () => {
     const appointmentService = app.get(AppointmentService);
+    const users = createUsers(appointmentService).slice(0, 2);
     const { id } = appointmentService.create({
-      participants: [1, 2],
+      participants: users,
       name: 'meet in the cinema',
     });
 
     await request(app.getHttpServer())
       .post(`/api/appointments/${id}/answers`)
       .send({
-        participantId: 1,
+        participantId: users[0],
         answer: AnswerEnum.ACCEPTED,
       });
 
     await request(app.getHttpServer())
       .post(`/api/appointments/${id}/answers`)
       .send({
-        participantId: 2,
+        participantId: users[1],
         answer: AnswerEnum.REJECTED,
       });
 
@@ -126,28 +139,29 @@ describe('AppointmentsController (e2e)', () => {
     expect(appointment.answers.length).toBe(2);
     expect(appointment).toMatchObject({
       name: 'meet in the cinema',
-      participants: [1, 2],
+      participants: users,
       state: StateEnum.CALLED_OFF,
     });
   });
 
   it('get appointment invitations for user', () => {
     const appointmentService = app.get(AppointmentService);
+    const users = createUsers(appointmentService);
     const { id: firstAppointmentId } = appointmentService.create({
-      participants: [1, 2, 3],
+      participants: users,
       name: 'meet in the cinema',
     });
     const { id: secondAppointmentId } = appointmentService.create({
-      participants: [1, 2, 3],
+      participants: users,
       name: 'meet in the park',
     });
     appointmentService.create({
-      participants: [2, 3],
+      participants: users.slice(2, 3),
       name: 'meet in the store',
     });
 
     return request(app.getHttpServer())
-      .get('/api/users/1/invites')
+      .get(`/api/users/${users[0]}/invites`)
       .expect(200)
       .expect((res) => {
         const body = res.body;
@@ -160,14 +174,22 @@ describe('AppointmentsController (e2e)', () => {
   });
 
   it('create appointment', async () => {
+    const appointmentService = app.get(AppointmentService);
+    const users = createUsers(appointmentService);
     await request(app.getHttpServer())
       .post('/api/appointments')
-      .send({ name: 'meet in the park', participants: [1, 2, 3] })
+      .send({ name: 'meet in the park', participants: users })
       .expect(201);
 
-    const appointmentService = app.get(AppointmentService);
     expect(appointmentService.getAll()[0].name).toBe('meet in the park');
     expect(appointmentService.getAll()[0].state).toBe(StateEnum.PENDING);
+  });
+
+  it('create appointment for a user that does not exist', async () => {
+    return request(app.getHttpServer())
+      .post('/api/appointments')
+      .send({ name: 'meet in the park', participants: [1] })
+      .expect(404);
   });
 
   afterAll(async () => {

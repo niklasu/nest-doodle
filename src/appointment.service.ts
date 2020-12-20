@@ -1,17 +1,24 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Appointment, StateEnum } from './appointment.entity';
 import { CreateAppointment } from './appointment.request';
 import { AnswerEnum, SubmitAnswer } from './submitAnswer';
+import { User } from './user';
 
 @Injectable()
 export class AppointmentService {
   appointments: Array<Appointment> = new Array<Appointment>();
+  users: Array<User> = new Array<User>();
 
   getAll(): Array<Appointment> {
     return this.appointments;
   }
 
   create(request: CreateAppointment) {
+    this.usersAreKnown(request.participants);
     const appointment = new Appointment(
       AppointmentService.getId(),
       request.name,
@@ -19,6 +26,15 @@ export class AppointmentService {
     );
     this.appointments.push(appointment);
     return appointment;
+  }
+
+  private usersAreKnown(participants: number[]): boolean {
+    participants.forEach((p) => {
+      if (!this.users.map((u) => u.id).includes(p)) {
+        throw new NotFoundException();
+      }
+    });
+    return true;
   }
 
   private static getId() {
@@ -54,5 +70,11 @@ export class AppointmentService {
 
   delete(appointmentId: number) {
     this.appointments = this.appointments.filter((a) => a.id != appointmentId);
+  }
+
+  createUser() {
+    const newUser = { id: AppointmentService.getId() };
+    this.users.push(newUser);
+    return newUser;
   }
 }
