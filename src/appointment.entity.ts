@@ -10,10 +10,17 @@ export class Appointment {
   name: string;
   participants: number[];
   answers: Answer[] = [];
+  state: StateEnum = StateEnum.PENDING;
 
   constructor(id: number, value: string, participants: number[]) {
     this.name = value;
     this.id = id;
     this.participants = participants;
   }
+}
+
+export enum StateEnum {
+  PENDING,
+  REJECTED,
+  ACCEPTED,
 }

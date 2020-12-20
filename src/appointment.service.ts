@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Appointment } from './appointment.entity';
+import { Appointment, StateEnum } from './appointment.entity';
 import { CreateAppointment } from './appointment.request';
-import { SubmitAnswer } from './submitAnswer';
+import { AnswerEnum, SubmitAnswer } from './submitAnswer';
 
 @Injectable()
 export class AppointmentService {
@@ -40,6 +40,16 @@ export class AppointmentService {
       participantId: request.participantId,
       answer: request.answer,
     });
+
+    if (app.answers.length === app.participants.length) {
+      const oneIsRejected: boolean =
+        app.answers.filter((a) => a.answer === AnswerEnum.REJECTED).length > 0;
+      if (oneIsRejected) {
+        app.state = StateEnum.REJECTED;
+      } else {
+        app.state = StateEnum.ACCEPTED;
+      }
+    }
   }
 
   delete(appointmentId: number) {

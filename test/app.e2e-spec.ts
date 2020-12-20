@@ -4,6 +4,7 @@ import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { AppointmentService } from '../src/appointment.service';
 import { AnswerEnum } from '../src/submitAnswer';
+import { StateEnum } from '../src/appointment.entity';
 
 describe('AppointmentsController (e2e)', () => {
   let app: INestApplication;
@@ -75,6 +76,61 @@ describe('AppointmentsController (e2e)', () => {
     });
   });
 
+  it('appointment state is accepted', async () => {
+    const appointmentService = app.get(AppointmentService);
+    const { id } = appointmentService.create({
+      participants: [1, 2],
+      name: 'meet in the cinema',
+    });
+
+    for (const i of [1, 2]) {
+      await request(app.getHttpServer())
+        .post(`/api/appointments/${id}/answers`)
+        .send({
+          participantId: i,
+          answer: AnswerEnum.ACCEPTED,
+        });
+    }
+
+    const appointment = appointmentService.getAll()[0];
+    expect(appointment.answers.length).toBe(2);
+    expect(appointment).toMatchObject({
+      name: 'meet in the cinema',
+      participants: [1, 2],
+      state: StateEnum.ACCEPTED,
+    });
+  });
+
+  it('appointment state is rejected', async () => {
+    const appointmentService = app.get(AppointmentService);
+    const { id } = appointmentService.create({
+      participants: [1, 2],
+      name: 'meet in the cinema',
+    });
+
+    await request(app.getHttpServer())
+      .post(`/api/appointments/${id}/answers`)
+      .send({
+        participantId: 1,
+        answer: AnswerEnum.ACCEPTED,
+      });
+
+    await request(app.getHttpServer())
+      .post(`/api/appointments/${id}/answers`)
+      .send({
+        participantId: 2,
+        answer: AnswerEnum.REJECTED,
+      });
+
+    const appointment = appointmentService.getAll()[0];
+    expect(appointment.answers.length).toBe(2);
+    expect(appointment).toMatchObject({
+      name: 'meet in the cinema',
+      participants: [1, 2],
+      state: StateEnum.REJECTED,
+    });
+  });
+
   it('get appointment invitations for user', () => {
     const appointmentService = app.get(AppointmentService);
     const { id: firstAppointmentId } = appointmentService.create({
@@ -111,6 +167,7 @@ describe('AppointmentsController (e2e)', () => {
 
     const appointmentService = app.get(AppointmentService);
     expect(appointmentService.getAll()[0].name).toBe('meet in the park');
+    expect(appointmentService.getAll()[0].state).toBe(StateEnum.PENDING);
   });
 
   afterAll(async () => {
