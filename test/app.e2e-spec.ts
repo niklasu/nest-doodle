@@ -79,7 +79,7 @@ describe('AppointmentsController (e2e)', () => {
     });
 
     return request(app.getHttpServer())
-      .get('/users/1')
+      .get('/api/users/1/invites')
       .expect(200)
       .expect((res) => {
         const body = res.body;
