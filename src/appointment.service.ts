@@ -7,6 +7,7 @@ import { Appointment, StateEnum } from './appointment.entity';
 import { CreateAppointment } from './appointment.request';
 import { AnswerEnum, SubmitAnswer } from './submitAnswer';
 import { User } from './user';
+import { CreateUserRequest } from './createUserRequest';
 
 @Injectable()
 export class AppointmentService {
@@ -72,8 +73,8 @@ export class AppointmentService {
     this.appointments = this.appointments.filter((a) => a.id != appointmentId);
   }
 
-  createUser() {
-    const newUser = { id: AppointmentService.getId() };
+  createUser(request: CreateUserRequest) {
+    const newUser = { id: AppointmentService.getId(), ...request };
     this.users.push(newUser);
     return newUser;
   }

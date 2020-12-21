@@ -19,9 +19,9 @@ describe('AppointmentsController (e2e)', () => {
 
   function createUsers(appointmentService: AppointmentService): Array<number> {
     return [
-      appointmentService.createUser().id,
-      appointmentService.createUser().id,
-      appointmentService.createUser().id,
+      appointmentService.createUser({ name: 'fred' }).id,
+      appointmentService.createUser({ name: 'fred' }).id,
+      appointmentService.createUser({ name: 'fred' }).id,
     ];
   }
 
@@ -190,6 +190,13 @@ describe('AppointmentsController (e2e)', () => {
       .post('/api/appointments')
       .send({ name: 'meet in the park', participants: [1] })
       .expect(404);
+  });
+
+  it('create user', async () => {
+    return request(app.getHttpServer())
+      .post('/api/users')
+      .send({ name: 'fred' })
+      .expect(201);
   });
 
   afterAll(async () => {
