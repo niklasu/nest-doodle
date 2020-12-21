@@ -15,9 +15,19 @@ import { User } from '../user';
 export class UsersController {
   constructor(private readonly appointmentService: AppointmentService) {}
 
+  @Get()
+  getAll(): Array<User> {
+    return this.appointmentService.getAllUsers();
+  }
+
+  @Get(':id')
+  getByUserId(@Param('id', ParseIntPipe) id: number): User {
+    return this.appointmentService.getUser(id);
+  }
+
   @Get(':id/invites')
-  getByUserId(@Param('id', ParseIntPipe) id: number): Array<Appointment> {
-    return this.appointmentService.getUserById(id);
+  getInvitesForUser(@Param('id', ParseIntPipe) id: number): Array<Appointment> {
+    return this.appointmentService.getInvitesForUser(id);
   }
 
   @Post()

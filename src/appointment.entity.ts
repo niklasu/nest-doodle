@@ -1,4 +1,4 @@
-import { AnswerEnum } from './submitAnswer';
+import { AnswerEnum } from './AnswerEnum';
 
 class Answer {
   participantId: number;

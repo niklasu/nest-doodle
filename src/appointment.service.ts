@@ -5,9 +5,10 @@ import {
 } from '@nestjs/common';
 import { Appointment, StateEnum } from './appointment.entity';
 import { CreateAppointment } from './appointment.request';
-import { AnswerEnum, SubmitAnswer } from './submitAnswer';
+import { SubmitAnswer } from './submitAnswer';
 import { User } from './user';
 import { CreateUserRequest } from './createUserRequest';
+import { AnswerEnum } from './AnswerEnum';
 
 @Injectable()
 export class AppointmentService {
@@ -42,7 +43,7 @@ export class AppointmentService {
     return Math.floor(Math.random() * (999 + 1));
   }
 
-  getUserById(id: number) {
+  getInvitesForUser(id: number) {
     return this.appointments.filter((a) => a.participants.includes(id));
   }
 
@@ -53,18 +54,28 @@ export class AppointmentService {
     }
     const app = appointmentsWithId[0];
 
-    app.answers.push({
-      participantId: request.participantId,
-      answer: request.answer,
-    });
+    const answers = app.answers;
+    const givenAnswerForUser = answers.filter(
+      (a) => a.participantId == request.participantId,
+    );
+    if (givenAnswerForUser.length == 0) {
+      answers.push({
+        participantId: request.participantId,
+        answer: request.answer,
+      });
+    } else {
+      givenAnswerForUser[0].answer = request.answer;
+    }
 
-    if (app.answers.length === app.participants.length) {
-      const oneIsRejected: boolean =
-        app.answers.filter((a) => a.answer === AnswerEnum.REJECTED).length > 0;
-      if (oneIsRejected) {
-        app.state = StateEnum.CALLED_OFF;
-      } else {
+    const oneIsRejected: boolean =
+      answers.filter((a) => a.answer == AnswerEnum.REJECTED).length > 0;
+    if (oneIsRejected) {
+      app.state = StateEnum.CALLED_OFF;
+    } else {
+      if (answers.length === app.participants.length) {
         app.state = StateEnum.CONFIRMED;
+      } else {
+        app.state = StateEnum.PENDING;
       }
     }
   }
@@ -77,5 +88,17 @@ export class AppointmentService {
     const newUser = { id: AppointmentService.getId(), ...request };
     this.users.push(newUser);
     return newUser;
+  }
+
+  getAllUsers() {
+    return this.users;
+  }
+
+  getUser(id: number) {
+    const user = this.users.filter((u) => u.id === id);
+    if (user.length != 1) {
+      throw new NotFoundException();
+    }
+    return user[0];
   }
 }

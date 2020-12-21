@@ -3,8 +3,8 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { AppointmentService } from '../src/appointment.service';
-import { AnswerEnum } from '../src/submitAnswer';
 import { StateEnum } from '../src/appointment.entity';
+import { AnswerEnum } from '../src/AnswerEnum';
 
 describe('AppointmentsController (e2e)', () => {
   let app: INestApplication;
@@ -136,6 +136,47 @@ describe('AppointmentsController (e2e)', () => {
       });
 
     const appointment = appointmentService.getAll()[0];
+    expect(appointment.answers.length).toBe(2);
+    expect(appointment).toMatchObject({
+      name: 'meet in the cinema',
+      participants: users,
+      state: StateEnum.CALLED_OFF,
+    });
+  });
+
+  it('appointment state switches from accepted to rejected', async () => {
+    const appointmentService = app.get(AppointmentService);
+    const users = createUsers(appointmentService).slice(0, 2);
+    const { id } = appointmentService.create({
+      participants: users,
+      name: 'meet in the cinema',
+    });
+
+    for (const i of users) {
+      await request(app.getHttpServer())
+        .post(`/api/appointments/${id}/answers`)
+        .send({
+          participantId: i,
+          answer: AnswerEnum.ACCEPTED,
+        });
+    }
+
+    let appointment = appointmentService.getAll()[0];
+    expect(appointment.answers.length).toBe(2);
+    expect(appointment).toMatchObject({
+      name: 'meet in the cinema',
+      participants: users,
+      state: StateEnum.CONFIRMED,
+    });
+
+    await request(app.getHttpServer())
+      .post(`/api/appointments/${id}/answers`)
+      .send({
+        participantId: users[0],
+        answer: AnswerEnum.REJECTED,
+      });
+
+    appointment = appointmentService.getAll()[0];
     expect(appointment.answers.length).toBe(2);
     expect(appointment).toMatchObject({
       name: 'meet in the cinema',
