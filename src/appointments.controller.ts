@@ -30,11 +30,13 @@ export class AppointmentsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   delete(@Param('id', ParseIntPipe) appointmentId: number) {
     return this.appointmentService.delete(appointmentId);
   }
 
   @Post(':id/answers')
+  @UseGuards(JwtAuthGuard)
   answer(
     @Body() request: SubmitAnswer,
     @Param('id', ParseIntPipe) appointmentId: number,

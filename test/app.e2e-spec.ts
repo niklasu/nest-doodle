@@ -67,7 +67,9 @@ describe('AppointmentsController (e2e)', () => {
       name: 'meet in the park',
     });
 
-    await request(app.getHttpServer()).delete(`/api/appointments/${id}`);
+    await request(app.getHttpServer())
+      .delete(`/api/appointments/${id}`)
+      .set(authHeaders);
 
     expect(appointmentService.getAll().length).toBe(0);
   });
@@ -75,6 +77,7 @@ describe('AppointmentsController (e2e)', () => {
   it('submit for appointment that does not exist', () => {
     return request(app.getHttpServer())
       .post('/api/appointments/33/answers')
+      .set(authHeaders)
       .expect(400);
   });
 
@@ -91,7 +94,8 @@ describe('AppointmentsController (e2e)', () => {
       .send({
         participantId: 42,
         answer: AnswerEnum.ACCEPTED,
-      });
+      })
+      .set(authHeaders);
 
     expect(appointmentService.getAll()[0].answers.length).toBe(1);
     const createdAnswer = appointmentService.getAll()[0].answers[0];
@@ -115,7 +119,8 @@ describe('AppointmentsController (e2e)', () => {
         .send({
           participantId: i,
           answer: AnswerEnum.ACCEPTED,
-        });
+        })
+        .set(authHeaders);
     }
 
     const appointment = appointmentService.getAll()[0];
@@ -140,14 +145,16 @@ describe('AppointmentsController (e2e)', () => {
       .send({
         participantId: users[0],
         answer: AnswerEnum.ACCEPTED,
-      });
+      })
+      .set(authHeaders);
 
     await request(app.getHttpServer())
       .post(`/api/appointments/${id}/answers`)
       .send({
         participantId: users[1],
         answer: AnswerEnum.REJECTED,
-      });
+      })
+      .set(authHeaders);
 
     const appointment = appointmentService.getAll()[0];
     expect(appointment.answers.length).toBe(2);
@@ -172,7 +179,8 @@ describe('AppointmentsController (e2e)', () => {
         .send({
           participantId: i,
           answer: AnswerEnum.ACCEPTED,
-        });
+        })
+        .set(authHeaders);
     }
 
     let appointment = appointmentService.getAll()[0];
@@ -188,7 +196,8 @@ describe('AppointmentsController (e2e)', () => {
       .send({
         participantId: users[0],
         answer: AnswerEnum.REJECTED,
-      });
+      })
+      .set(authHeaders);;
 
     appointment = appointmentService.getAll()[0];
     expect(appointment.answers.length).toBe(2);
