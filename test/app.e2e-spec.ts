@@ -5,6 +5,7 @@ import { AppModule } from '../src/app.module';
 import { AppointmentService } from '../src/appointment.service';
 import { StateEnum } from '../src/appointment.entity';
 import { AnswerEnum } from '../src/AnswerEnum';
+import { UsersService } from '../src/users/users.service';
 
 describe('AppointmentsController (e2e)', () => {
   let app: INestApplication;
@@ -15,6 +16,9 @@ describe('AppointmentsController (e2e)', () => {
     }).compile();
     app = moduleFixture.createNestApplication();
     await app.init();
+
+    const userService = app.get(UsersService);
+    userService.create({ name: 'john', password: 'changeme' });
 
     await request(app.getHttpServer())
       .post('/auth/login')
@@ -29,9 +33,9 @@ describe('AppointmentsController (e2e)', () => {
 
   function createUsers(appointmentService: AppointmentService): Array<number> {
     return [
-      appointmentService.createUser({ name: 'fred' }).id,
-      appointmentService.createUser({ name: 'fred' }).id,
-      appointmentService.createUser({ name: 'fred' }).id,
+      appointmentService.createUser({ name: 'fred', password: '1' }).id,
+      appointmentService.createUser({ name: 'fred2', password: '2' }).id,
+      appointmentService.createUser({ name: 'fred3', password: '3' }).id,
     ];
   }
 
@@ -247,10 +251,16 @@ describe('AppointmentsController (e2e)', () => {
   });
 
   it('create user', async () => {
-    return request(app.getHttpServer())
+    const userService = app.get(UsersService);
+    await request(app.getHttpServer())
       .post('/api/users')
-      .send({ name: 'fred' })
+      .send({ name: 'fred', password: '123' })
       .expect(201);
+
+    expect(await userService.findOne('fred')).toMatchObject({
+      name: 'fred',
+      password: '123',
+    });
   });
 
   afterAll(async () => {

@@ -39,7 +39,7 @@ export class AppointmentService {
     return true;
   }
 
-  private static getId() {
+  static getId() {
     return Math.floor(Math.random() * (999 + 1));
   }
 

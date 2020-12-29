@@ -10,10 +10,14 @@ import { AppointmentService } from '../appointment.service';
 import { Appointment } from '../appointment.entity';
 import { CreateUserRequest } from '../createUserRequest';
 import { User } from '../user';
+import { UsersService } from './users.service';
 
 @Controller('/api/users')
 export class UsersController {
-  constructor(private readonly appointmentService: AppointmentService) {}
+  constructor(
+    private readonly appointmentService: AppointmentService,
+    private readonly userService: UsersService,
+  ) {}
 
   @Get()
   getAll(): Array<User> {
@@ -32,6 +36,6 @@ export class UsersController {
 
   @Post()
   createUser(@Body() request: CreateUserRequest): User {
-    return this.appointmentService.createUser(request);
+    return this.userService.create(request);
   }
 }
