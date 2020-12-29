@@ -8,13 +8,23 @@ import { AnswerEnum } from '../src/AnswerEnum';
 
 describe('AppointmentsController (e2e)', () => {
   let app: INestApplication;
-
+  let authHeaders = {};
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
     app = moduleFixture.createNestApplication();
     await app.init();
+
+    await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        username: 'john',
+        password: 'changeme',
+      })
+      .then((res) => {
+        authHeaders = { Authorization: `Bearer ${res.body.access_token}` };
+      });
   });
 
   function createUsers(appointmentService: AppointmentService): Array<number> {
@@ -25,7 +35,7 @@ describe('AppointmentsController (e2e)', () => {
     ];
   }
 
-  it('Get all appointments', () => {
+  it('Get all appointments', async () => {
     const appointmentService = app.get(AppointmentService);
     const createdUserIds = createUsers(appointmentService);
     appointmentService.create({
@@ -217,8 +227,10 @@ describe('AppointmentsController (e2e)', () => {
   it('create appointment', async () => {
     const appointmentService = app.get(AppointmentService);
     const users = createUsers(appointmentService);
+
     await request(app.getHttpServer())
       .post('/api/appointments')
+      .set(authHeaders)
       .send({ name: 'meet in the park', participants: users })
       .expect(201);
 
@@ -229,6 +241,7 @@ describe('AppointmentsController (e2e)', () => {
   it('create appointment for a user that does not exist', async () => {
     return request(app.getHttpServer())
       .post('/api/appointments')
+      .set(authHeaders)
       .send({ name: 'meet in the park', participants: [1] })
       .expect(404);
   });

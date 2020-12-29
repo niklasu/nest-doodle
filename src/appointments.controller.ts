@@ -6,11 +6,13 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { AppointmentService } from './appointment.service';
 import { Appointment } from './appointment.entity';
 import { CreateAppointment } from './appointment.request';
 import { SubmitAnswer } from './submitAnswer';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 @Controller('/api/appointments')
 export class AppointmentsController {
@@ -22,6 +24,7 @@ export class AppointmentsController {
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   create(@Body() request: CreateAppointment): Appointment {
     return this.appointmentService.create(request);
   }
